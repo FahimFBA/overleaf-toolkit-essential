@@ -1,0 +1,28 @@
+# Logs
+*.log
+*.out
+
+# Python virtual environment
+venv/
+
+# MkDocs build output
+site/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*~
+*.swp
+
+# Overleaf/TeX temporary files
+*.aux
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.pdf
+
+# Environment files
+.env
