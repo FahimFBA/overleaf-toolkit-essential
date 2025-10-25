@@ -133,7 +133,7 @@ crontab -e
 * Linux, macOS, or WSL2 host
 * Cron service enabled on host
 
-> **Tip:** Tested on Ubuntu 24.04 and WSL2 environments.
+> **Tip:** Tested on Ubuntu 24.04, MacOS and Windows 11 (WSL2) environments.
 
 ---
 
