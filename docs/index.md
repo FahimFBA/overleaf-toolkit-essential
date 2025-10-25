@@ -104,7 +104,7 @@ Please follow these steps to contribute:
 
 ## License
 
-This project is licensed under the [MIT License](../LICENSE).
+This project is licensed under the [MIT License](https://github.com/FahimFBA/overleaf-toolkit-essential/blob/main/LICENSE).
 You are free to use, modify, and distribute this toolkit under open-source terms.
 
 ---
