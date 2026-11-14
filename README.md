@@ -1,179 +1,139 @@
 # Overleaf Toolkit Essential
 
-A lightweight automation toolkit for managing and enhancing **local Overleaf installations**.  
-It automates LaTeX package installation, updates TeX Live automatically, and keeps your environment consistent with Overleaf’s cloud setup.
+[![Docs](https://github.com/FahimFBA/overleaf-toolkit-essential/actions/workflows/docs.yml/badge.svg)](https://github.com/FahimFBA/overleaf-toolkit-essential/actions/workflows/docs.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
----
+Automation scripts for self-hosted Overleaf. The toolkit installs commonly used LaTeX packages inside the `sharelatex/sharelatex` Docker container, keeps TeX Live up to date on a schedule, and brings a local installation closer to the package set available on Overleaf's cloud service.
 
-## 🎥 Setup Video Guide
+**Documentation:** <https://fahimfba.github.io/overleaf-toolkit-essential>
+**Video walkthrough:** [Setup tutorial on YouTube](https://youtu.be/jDy9rdgSoHs)
 
-📺 **[Watch the full setup tutorial on YouTube](https://youtu.be/jDy9rdgSoHs)**
+## Features
 
-This walkthrough covers:
+- Configuration through a single `.env` file
+- Installs only the packages that are missing
+- Scheduled TeX Live updates through cron, with a configurable schedule
+- Idempotent scripts that are safe to run repeatedly
+- Reports failed installs and exits with a non-zero status
+- Runs on Linux, macOS, and Windows through WSL2
 
-- Cloning and configuring the toolkit
-- Installing and verifying LaTeX packages
-- Troubleshooting common issues
+## Requirements
 
----
+- Docker, with a running `sharelatex/sharelatex` container
+- `tlmgr` available inside the container
+- A Linux, macOS, or WSL2 host
+- A running cron service on the host
 
-## ⚙️ Overview
+Tested on Ubuntu 24.04, macOS, and Windows 11 (WSL2).
 
-**Overleaf Toolkit Essential** is ideal for developers and researchers using the `sharelatex/sharelatex` Docker image.  
-It ensures your local Overleaf setup stays up-to-date with minimal maintenance.
+## Installation
 
-### Key Features
-
-- Environment-driven configuration via `.env`
-- Smart package installation (only missing packages)
-- Weekly cron-based updates for TeX Live
-- Non-destructive and idempotent scripts
-- Works on Linux, macOS, and WSL2
-
----
-
-## 🚀 Quick Start
-
-### 1. Clone the repository
+Clone the repository and create your configuration file:
 
 ```bash
 git clone https://github.com/FahimFBA/overleaf-toolkit-essential.git
 cd overleaf-toolkit-essential
-````
-
-### 2. Copy and configure environment
-
-```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your system paths (example):
-
-```bash
-CONTAINER_NAME=sharelatex
-PROJECT_DIR=$HOME/tmp-overleaf/overleaf-toolkit-essential
-LOG_FILE=$PROJECT_DIR/latex-update.log
-INSTALL_SCRIPT=$PROJECT_DIR/scripts/install-latex-packages.sh
-```
-
-> **Note:** Use absolute paths.
-> On WSL2, ensure it points to your Linux filesystem (e.g., `/home/youruser/tmp-overleaf/...`).
-
-### 3. Make scripts executable
+Edit `.env` to match your environment (see [Configuration](#configuration)), then make the scripts executable:
 
 ```bash
 chmod +x scripts/*.sh
 ```
 
-### 4. Install LaTeX packages
+## Usage
+
+Install the default package set:
 
 ```bash
 ./scripts/install-latex-packages.sh
 ```
 
-### 5. Enable weekly auto-update
+Update `tlmgr` and every installed TeX Live package:
+
+```bash
+./scripts/update-all-packages.sh
+```
+
+Schedule the installer to run automatically:
 
 ```bash
 ./scripts/setup-weekly-cron.sh
 ```
 
-This runs every **Monday at 4:00 AM** and logs results to `latex-update.log`.
+By default the job runs every Monday at 4:00 AM and appends output to the log file set in `.env`. Existing cron entries are preserved.
 
----
+| Script                       | Purpose                                                   |
+| ---------------------------- | --------------------------------------------------------- |
+| `install-latex-packages.sh`  | Installs any missing packages from the default list       |
+| `update-all-packages.sh`     | Runs `tlmgr update --self --all` inside the container     |
+| `setup-weekly-cron.sh`       | Adds or replaces the scheduled cron job                   |
+| `load-env.sh`                | Loads `.env`; sourced by the other scripts                |
 
-## 🧩 Configuration
+## Configuration
 
-All settings are managed via `.env`:
+All settings live in `.env`. Use absolute paths, because cron does not run from your project directory.
 
-| Variable         | Description               | Example                                                                                 |
-| ---------------- | ------------------------- | --------------------------------------------------------------------------------------- |
-| `CONTAINER_NAME` | Overleaf container name   | `sharelatex`                                                                            |
-| `PROJECT_DIR`    | Toolkit directory on host | `/home/youruser/tmp-overleaf/overleaf-toolkit-essential`                                   |
-| `LOG_FILE`       | Log file path             | `/home/youruser/tmp-overleaf/overleaf-toolkit-essential/latex-update.log`                  |
-| `INSTALL_SCRIPT` | Path to installer script  | `/home/youruser/tmp-overleaf/overleaf-toolkit-essential/scripts/install-latex-packages.sh` |
+| Variable         | Description                                  | Default                                  |
+| ---------------- | -------------------------------------------- | ---------------------------------------- |
+| `CONTAINER_NAME` | Name of the running Overleaf container       | `sharelatex`                             |
+| `PROJECT_DIR`    | Toolkit directory on the host                | Repository root                          |
+| `LOG_FILE`       | File that receives output from scheduled runs | `$PROJECT_DIR/latex-update.log`          |
+| `INSTALL_SCRIPT` | Path to the installer script run by cron     | `$PROJECT_DIR/scripts/install-latex-packages.sh` |
+| `CRON_EXPR`      | Cron schedule (`min hour day month weekday`) | `0 4 * * 1`                              |
 
----
+Example:
 
-## 📦 Installed Packages
+```bash
+CONTAINER_NAME=sharelatex
+PROJECT_DIR=$HOME/overleaf-toolkit-essential
+LOG_FILE=$PROJECT_DIR/latex-update.log
+INSTALL_SCRIPT=$PROJECT_DIR/scripts/install-latex-packages.sh
+CRON_EXPR="0 4 * * 1"
+```
 
-By default, the toolkit installs these essential LaTeX packages:
+On WSL2, point these paths at the Linux filesystem (for example `/home/youruser/...`), not at `/mnt/c/...`. After changing `CRON_EXPR`, run `./scripts/setup-weekly-cron.sh` again.
+
+## Default packages
 
 ```
-amsmath, amsfonts, amssymb, mathtools, siunitx,
+amsmath, amsfonts, mathtools, siunitx,
 xcolor, graphics, float, geometry, fancyhdr, subfig, caption,
 listings, algorithms, algorithm2e, pgf, pgfplots,
 hyperref, booktabs, multirow, tools, lipsum
 ```
 
-> These are **tlmgr package names**, which cover the LaTeX packages you `\usepackage{}`:
-> `graphics` → `graphicx`, `tools` → `array`/`longtable`/`tabularx`,
-> `algorithms` → `algorithm`/`algorithmic`, `pgf` → `tikz`, `amsfonts` → `amssymb`,
-> `caption` → `subcaption`.
+These are `tlmgr` package names, and each one provides several LaTeX packages:
 
-You can add more in `scripts/install-latex-packages.sh`.
+| tlmgr package | Provides                              |
+| ------------- | ------------------------------------- |
+| `graphics`    | `graphicx`                            |
+| `tools`       | `array`, `longtable`, `tabularx`      |
+| `algorithms`  | `algorithm`, `algorithmic`            |
+| `pgf`         | `tikz`                                |
+| `amsfonts`    | `amssymb`                             |
+| `caption`     | `subcaption`                          |
 
----
+To add packages, edit the `ALL_PACKAGES` array in `scripts/install-latex-packages.sh`. Use `tlmgr search --global --file <name>.sty` inside the container to find the package that provides a file.
 
-## 🕒 Weekly Auto-Update
+## Contributing
 
-The scheduled cron job runs automatically:
+Contributions are welcome, including new packages, cross-platform fixes, and documentation improvements.
 
-```
-0 4 * * 1 /path/to/install-latex-packages.sh >> /path/to/latex-update.log 2>&1
-```
+1. Fork the repository.
+2. Create a branch (`feature/your-change`).
+3. Commit your changes.
+4. Open a pull request that describes what changed and why.
 
-To view or edit your cron jobs:
+Notable changes are recorded in [CHANGELOG.md](CHANGELOG.md).
 
-```bash
-crontab -l
-crontab -e
-```
+## License
 
----
+Released under the [MIT License](LICENSE).
 
-## 🧰 Requirements
+## Author
 
-* Docker (running `sharelatex/sharelatex`)
-* Access to `tlmgr` inside the container
-* Linux, macOS, or WSL2 host
-* Cron service enabled on host
+Md. Fahim Bin Amin ([GitHub](https://github.com/FahimFBA), [LinkedIn](https://www.linkedin.com/in/fahimfba/))
 
-> **Tip:** Tested on Ubuntu 24.04, MacOS and Windows 11 (WSL2) environments.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-You can help by:
-
-* Adding more LaTeX packages
-* Improving automation or cross-platform support
-* Enhancing installation or troubleshooting scripts
-
-### To contribute:
-
-1. Fork this repository
-2. Create a feature branch (`feature/your-update`)
-3. Commit your changes
-4. Submit a pull request with a clear description
-
----
-
-## 🧾 License
-
-This project is licensed under the [MIT License](LICENSE).
-You’re free to use, modify, and distribute it under open-source terms.
-
----
-
-## 👤 Author
-
-**Md. Fahim Bin Amin**
-[GitHub Profile](https://github.com/FahimFBA) • [LinkedIn](https://www.linkedin.com/in/fahimfba/)
-
-> This is an independent open-source project, not affiliated with Overleaf Ltd.
-
----
-
-⭐ **If you find this project helpful, please star it on GitHub!**
+This is an independent project and is not affiliated with Overleaf Ltd.
