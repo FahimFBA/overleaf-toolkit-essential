@@ -95,6 +95,8 @@ plugins:
   - search
   - tags
   - mermaid2
+  - git-revision-date-localized:
+      enable_creation_date: true
 
 # ------------------------------------------------------------
 #  Extra configuration (footer & social links)
@@ -109,7 +111,7 @@ extra:
       name: LinkedIn
   generator: false
   copyright: >
-    © 2025 Md. Fahim Bin Amin. Licensed under the MIT License.
+    © 2026 Md. Fahim Bin Amin. Licensed under the MIT License.
 
 # ------------------------------------------------------------
 #  Exclude files from documentation build

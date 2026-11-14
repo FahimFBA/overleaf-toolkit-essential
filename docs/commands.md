@@ -83,7 +83,7 @@ The default log file path is defined in `.env`:
 
 ````
 ```bash
-LOG_FILE=/home/fahim/tmp-overleaf/overleaf-toolkit-essential/latex-update.log
+LOG_FILE=/home/youruser/tmp-overleaf/overleaf-toolkit-essential/latex-update.log
 ```
 ````
 
@@ -110,7 +110,7 @@ Use it only when troubleshooting — not for automated cron execution.
 | Variable         | Description                    | Example                                               |
 | ---------------- | ------------------------------ | ----------------------------------------------------- |
 | `CONTAINER_NAME` | Overleaf Docker container name | `sharelatex`                                          |
-| `PROJECT_DIR`    | Toolkit base directory         | `/home/fahim/tmp-overleaf/overleaf-toolkit-essential` |
+| `PROJECT_DIR`    | Toolkit base directory         | `/home/youruser/tmp-overleaf/overleaf-toolkit-essential` |
 | `LOG_FILE`       | Log output file path           | `$PROJECT_DIR/latex-update.log`                       |
 | `INSTALL_SCRIPT` | Path to installer script       | `$PROJECT_DIR/scripts/install-latex-packages.sh`      |
 

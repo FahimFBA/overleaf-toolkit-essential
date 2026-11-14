@@ -148,7 +148,7 @@ crontab -l
 Expected output:
 
 ```bash
-0 4 * * 1 /home/fahim/tmp-overleaf/overleaf-toolkit-essential/scripts/install-latex-packages.sh >> /home/fahim/tmp-overleaf/overleaf-toolkit-essential/latex-update.log 2>&1
+0 4 * * 1 /home/youruser/tmp-overleaf/overleaf-toolkit-essential/scripts/install-latex-packages.sh >> /home/youruser/tmp-overleaf/overleaf-toolkit-essential/latex-update.log 2>&1
 ```
 
 ---

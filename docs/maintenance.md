@@ -87,7 +87,7 @@ crontab -l
 Expected output (example):
 
 ```bash
-0 4 * * 1 /home/fahim/tmp-overleaf/overleaf-toolkit-essential/scripts/install-latex-packages.sh >> /home/fahim/tmp-overleaf/overleaf-toolkit-essential/latex-update.log 2>&1
+0 4 * * 1 /home/youruser/tmp-overleaf/overleaf-toolkit-essential/scripts/install-latex-packages.sh >> /home/youruser/tmp-overleaf/overleaf-toolkit-essential/latex-update.log 2>&1
 ```
 
 ### 3.2 Removing or Editing Cron Jobs
@@ -123,7 +123,7 @@ LOG_FILE=/path/to/latex-update.log
 Example:
 
 ```bash
-/home/fahim/tmp-overleaf/overleaf-toolkit-essential/latex-update.log
+/home/youruser/tmp-overleaf/overleaf-toolkit-essential/latex-update.log
 ```
 
 ### 4.2 Viewing Logs
@@ -270,7 +270,7 @@ Run the script again:
 
 ### 6.2 Changing Update Schedule
 
-Edit `scripts/setup-weekly-cron.sh` and modify the cron expression:
+Set `CRON_EXPR` in your `.env` file (default: `0 4 * * 1`):
 
 Example — Run every day at 2 AM:
 

@@ -3,45 +3,55 @@
 # Overleaf Toolkit – Smart LaTeX Package Installer
 # Author: Md. Fahim Bin Amin
 # ===================================================================
+set -uo pipefail
 
 # Load environment variables
-source "$(dirname "$0")/load-env.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/load-env.sh"
 
-# Check if container is running
-if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-  echo "Container '${CONTAINER_NAME}' is not running."
-  echo "Start it first with: docker start ${CONTAINER_NAME}"
-  exit 1
-fi
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting LaTeX package check"
+
+require_container
 
 echo "Updating tlmgr (TeX Live Manager)..."
-docker exec -i $CONTAINER_NAME tlmgr update --self >/dev/null 2>&1
-echo "tlmgr updated."
+if docker exec "$CONTAINER_NAME" tlmgr update --self; then
+  echo "tlmgr updated."
+else
+  echo "Warning: 'tlmgr update --self' failed; continuing with the existing tlmgr." >&2
+fi
 
-# Package list
+# Package list. Names are *tlmgr package* names, which can differ from the
+# LaTeX package you \usepackage{}:
+#   graphics -> graphicx        tools   -> array, longtable, tabularx
+#   algorithms -> algorithm, algorithmic      pgf -> tikz
+#   amsfonts -> amssymb         caption -> subcaption
 ALL_PACKAGES=(
-  amsmath amsfonts amssymb mathtools siunitx
-  xcolor graphicx float geometry fancyhdr subfig caption subcaption
-  listings algorithm algorithmic algorithms algorithm2e
-  tikz pgfplots
-  hyperref booktabs multirow array longtable tabularx lipsum
+  amsmath amsfonts mathtools siunitx
+  xcolor graphics float geometry fancyhdr subfig caption
+  listings algorithms algorithm2e
+  pgf pgfplots
+  hyperref booktabs multirow tools lipsum
 )
 
-# Install missing packages
+FAILED=()
+
 echo "Checking LaTeX packages inside '${CONTAINER_NAME}'..."
 for pkg in "${ALL_PACKAGES[@]}"; do
-  docker exec -i $CONTAINER_NAME tlmgr info "$pkg" 2>/dev/null | grep -q "installed: Yes"
-  if [ $? -eq 0 ]; then
+  if docker exec "$CONTAINER_NAME" tlmgr info "$pkg" 2>/dev/null | grep -q "installed: *Yes"; then
     echo "$pkg already installed."
   else
     echo "Installing $pkg ..."
-    docker exec -i $CONTAINER_NAME tlmgr install "$pkg" >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
+    if docker exec "$CONTAINER_NAME" tlmgr install "$pkg"; then
       echo "$pkg installed successfully."
     else
-      echo "Failed to install $pkg."
+      echo "Failed to install $pkg." >&2
+      FAILED+=("$pkg")
     fi
   fi
 done
 
-echo "All LaTeX packages are now up to date."
+if [ ${#FAILED[@]} -gt 0 ]; then
+  echo "Finished with errors. Failed packages: ${FAILED[*]}" >&2
+  exit 1
+fi
+
+echo "All LaTeX packages are installed."

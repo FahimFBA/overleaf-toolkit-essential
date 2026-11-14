@@ -3,20 +3,17 @@
 # Overleaf Toolkit – Full LaTeX Update Script
 # Author: Md. Fahim Bin Amin
 # ===================================================================
+set -uo pipefail
 
-source "$(dirname "$0")/load-env.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/load-env.sh"
 
-if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-  echo "Container '${CONTAINER_NAME}' is not running."
-  echo "Start it first with: docker start ${CONTAINER_NAME}"
-  exit 1
-fi
+require_container
 
-echo "Updating tlmgr and all TeX Live packages inside '${CONTAINER_NAME}'..."
-docker exec -i $CONTAINER_NAME tlmgr update --self --all >/dev/null 2>&1
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Updating tlmgr and all TeX Live packages inside '${CONTAINER_NAME}'..."
 
-if [ $? -eq 0 ]; then
+if docker exec "$CONTAINER_NAME" tlmgr update --self --all; then
   echo "All LaTeX packages successfully updated."
 else
-  echo "Error: Some packages could not be updated."
+  echo "Error: Some packages could not be updated." >&2
+  exit 1
 fi

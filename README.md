@@ -57,7 +57,7 @@ INSTALL_SCRIPT=$PROJECT_DIR/scripts/install-latex-packages.sh
 ```
 
 > **Note:** Use absolute paths.
-> On WSL2, ensure it points to your Linux filesystem (e.g., `/home/fahim/tmp-overleaf/...`).
+> On WSL2, ensure it points to your Linux filesystem (e.g., `/home/youruser/tmp-overleaf/...`).
 
 ### 3. Make scripts executable
 
@@ -88,9 +88,9 @@ All settings are managed via `.env`:
 | Variable         | Description               | Example                                                                                 |
 | ---------------- | ------------------------- | --------------------------------------------------------------------------------------- |
 | `CONTAINER_NAME` | Overleaf container name   | `sharelatex`                                                                            |
-| `PROJECT_DIR`    | Toolkit directory on host | `/home/fahim/tmp-overleaf/overleaf-toolkit-essential`                                   |
-| `LOG_FILE`       | Log file path             | `/home/fahim/tmp-overleaf/overleaf-toolkit-essential/latex-update.log`                  |
-| `INSTALL_SCRIPT` | Path to installer script  | `/home/fahim/tmp-overleaf/overleaf-toolkit-essential/scripts/install-latex-packages.sh` |
+| `PROJECT_DIR`    | Toolkit directory on host | `/home/youruser/tmp-overleaf/overleaf-toolkit-essential`                                   |
+| `LOG_FILE`       | Log file path             | `/home/youruser/tmp-overleaf/overleaf-toolkit-essential/latex-update.log`                  |
+| `INSTALL_SCRIPT` | Path to installer script  | `/home/youruser/tmp-overleaf/overleaf-toolkit-essential/scripts/install-latex-packages.sh` |
 
 ---
 
@@ -100,10 +100,15 @@ By default, the toolkit installs these essential LaTeX packages:
 
 ```
 amsmath, amsfonts, amssymb, mathtools, siunitx,
-xcolor, graphicx, float, geometry, fancyhdr, caption, subcaption,
-listings, algorithm, algorithmic, algorithm2e, tikz, pgfplots,
-hyperref, booktabs, multirow, array, longtable, tabularx, lipsum
+xcolor, graphics, float, geometry, fancyhdr, subfig, caption,
+listings, algorithms, algorithm2e, pgf, pgfplots,
+hyperref, booktabs, multirow, tools, lipsum
 ```
+
+> These are **tlmgr package names**, which cover the LaTeX packages you `\usepackage{}`:
+> `graphics` → `graphicx`, `tools` → `array`/`longtable`/`tabularx`,
+> `algorithms` → `algorithm`/`algorithmic`, `pgf` → `tikz`, `amsfonts` → `amssymb`,
+> `caption` → `subcaption`.
 
 You can add more in `scripts/install-latex-packages.sh`.
 
